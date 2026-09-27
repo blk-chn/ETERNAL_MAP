@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>パルナス地方｜ランドマークマップ</title>
+<style>
+:root{color-scheme:dark;--bg:#171713;--panel:#22221e;--line:#444238;--gold:#e1c47c;--muted:#aaa797}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f4f0e5;font:15px/1.55 system-ui,"Yu Gothic UI",Meiryo,sans-serif}header{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:15px}h1{font-size:19px;margin:0}header p{margin:0;color:var(--muted);font-size:13px}.layout{height:calc(100vh - 58px);min-height:480px;display:grid;grid-template-columns:minmax(0,1fr) 330px}.map-pane{position:relative;overflow:hidden;background:#29241d;display:grid;place-items:center}.map-wrap{position:relative;width:min(100%,calc(100vh - 58px));aspect-ratio:1;max-height:100%;flex:none}.map-wrap img{display:block;width:100%;height:100%;object-fit:fill;user-select:none}.pin{position:absolute;transform:translate(-50%,-50%) rotate(45deg);width:19px;height:19px;border:2px solid #d6c28f;border-radius:2px;background:linear-gradient(135deg,#171711 0 42%,#77705b 48%,#171711 58%);cursor:pointer;box-shadow:0 0 0 1px #17140e,0 1px 5px #000;transition:transform .15s,filter .15s,box-shadow .15s}.pin:after{content:"";position:absolute;inset:3px;border:1px solid #a99c76;background:#211f18}.pin:hover{transform:translate(-50%,-50%) rotate(45deg) scale(1.2);z-index:3}.pin.active{z-index:4;filter:brightness(1.8);border-color:#fff0b0;box-shadow:0 0 0 3px #e5d38b77,0 0 10px 6px #f7d96dcc,0 0 26px 13px #ffbf4b88;animation:pulse 1.6s ease-in-out infinite alternate}.pin.active:after{background:#ffe38b;border-color:#fff8d6;box-shadow:0 0 8px 3px #ffe99a}.pin:focus-visible{outline:2px solid #fff1b7;outline-offset:5px}.map-label{position:absolute;z-index:5;transform:translate(-50%,22px);padding:4px 9px;border:1px solid #d6c28f88;border-radius:5px;background:rgba(25,24,19,.72);color:#f7e8bb;font-size:13px;line-height:1.35;white-space:nowrap;text-shadow:0 1px 2px #000;box-shadow:0 2px 7px #0005;pointer-events:none;display:none}@keyframes pulse{to{box-shadow:0 0 0 5px #e5d38baa,0 0 15px 9px #f7d96df2,0 0 33px 17px #ffbf4db3}}aside{background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}.aside-head{padding:15px 16px 10px;border-bottom:1px solid var(--line)}.aside-head h2{font-size:16px;margin:0 0 8px}.aside-head input{width:100%;background:#151512;border:1px solid #514e43;border-radius:7px;color:#fff;padding:9px 10px;font:inherit}.hint{font-size:12px;color:var(--muted);margin:7px 0 0}.list{overflow:auto;padding:7px}.item{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:0;background:transparent;color:#eee9da;padding:8px;border-radius:7px;cursor:pointer;font:inherit}.item:hover,.item.active{background:#45402e}.num{flex:none;width:18px;height:18px;display:grid;place-items:center;border:1px solid #8c805d;border-radius:2px;transform:rotate(45deg);background:linear-gradient(135deg,#171711,#77705b,#171711);font-size:0;color:transparent}.detail{border-top:1px solid var(--line);padding:12px 16px;color:var(--muted);min-height:78px}.detail strong{display:block;color:#f4dfaa;font-size:15px}.empty{color:var(--muted);font-size:13px}@media(max-width:760px){.layout{height:auto;min-height:calc(100vh - 58px);grid-template-columns:1fr}.map-pane{height:auto;aspect-ratio:1}.map-wrap{width:100%;max-height:none}.pin{width:16px;height:16px}.pin:after{inset:2px}aside{border-left:0;border-top:1px solid var(--line);max-height:50vh}.list{max-height:240px}}
+</style></head>
+<body><header><h1>パルナス地方</h1><p>ランドマークを選ぶと、地図上の位置が光ります</p></header>
+<main class="layout"><section class="map-pane" aria-label="パルナス地方の地図"><div class="map-wrap" id="map"><img src="パルナス地方.png" alt="パルナス地方の地図"></div></section><aside><div class="aside-head"><h2>ランドマーク（あいうえお順）</h2><input id="search" type="search" placeholder="名前で検索" aria-label="ランドマークを検索"><p class="hint">一覧または地図上のダイヤを選択してください</p></div><div class="list" id="list"></div></aside></main>
+<script>
+const landmarks=[
+['ウォルドラ通り待機所',84.8,60.7],['英雄ヘンドリック像',16.0,78.4],['交差点の鍛冶屋',56.8,47.0],['国立墓地',46.55,64.15],['スティールハーツ・コンパニー',79.6,34.7],['スフィアジオード',37.9,51.7],['セルヴィス農園',45.6,16.7],['タビット橋',19.3,60.6],['デルストン鉱山入り口',88.3,26.6],['難民の集落',32.0,62.6],['難民のテント',38.6,37.0],['野盗のテント',63.6,75.8],['ノルダニア関所',49.3,84.0],['パルナス橋',32.75,73.0],['パルナス製油所',26.8,27.4],['貧民街',82.6,79.8],['貧民街・墓地',84.0,82.3],['ヘンドリックガーデン',19.6,78.2],['マナワームの泉',73.6,43.2],['水辺の一軒家',70.4,65.6],['旧教徒の祭壇',60.5,37.4],['古びた納屋',33.8,20.3],['監視塔',51.8,53.3],['レイバータウン',18.2,43.1]
+];
+let selected=-1;const map=document.querySelector('#map'),list=document.querySelector('#list');const label=document.createElement('div');label.className='map-label';map.append(label);
+landmarks.forEach(([name,x,y],i)=>{const b=document.createElement('button');b.className='pin';b.style.left=x+'%';b.style.top=y+'%';b.setAttribute('aria-label',name);b.onclick=()=>select(i);map.append(b)});
+function render(){const q=document.querySelector('#search').value.trim().toLocaleLowerCase('ja');list.replaceChildren();landmarks.forEach(([name],i)=>{if(!name.toLocaleLowerCase('ja').includes(q))return;const b=document.createElement('button');b.className='item'+(selected===i?' active':'');b.innerHTML=`<span class="num" aria-hidden="true"></span><span>${name}</span>`;b.onclick=()=>select(i);list.append(b)});document.querySelectorAll('.pin').forEach((b,i)=>b.classList.toggle('active',i===selected));if(selected>=0){const [name,x,y]=landmarks[selected];label.textContent=name;label.style.left=x+"%";label.style.top=y+"%";label.style.display="block"}else{label.style.display="none"}}
+function select(i){selected=i;render()}document.querySelector('#search').addEventListener('input',render);map.addEventListener('click',e=>{if(!e.target.closest('.pin')&&selected>=0){selected=-1;render()}});render();
+</script></body></html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
